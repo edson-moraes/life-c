@@ -21,9 +21,10 @@ typedef struct life_board {
     int *n_board;
     int rows;
     int columns;
+    int cell_size;
 } life_board;
 
-life_board *init_board(int rows, int columns);
+life_board *init_board(int rows, int columns, int cell_size);
 
 int set_random_pattern(life_board *board);
 
@@ -32,6 +33,8 @@ int get(life_board *board, int x, int y);
 void set(life_board *board, int x, int y, int value, bool curr);
 
 void advance_generation(life_board *board);
+
+void free_board(life_board *b);
 
 
 #endif //LIFE_C_BOARD_H

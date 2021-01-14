@@ -6,11 +6,12 @@
 #include <stdio.h>
 #include "board.h"
 
-life_board *init_board(int rows, int columns) {
+life_board *init_board(int rows, int columns, int cell_size) {
     life_board *result = malloc(sizeof(life_board));
 
     result->rows = rows;
     result->columns = columns;
+    result->cell_size = cell_size;
 
     result->c_board = calloc(rows * columns, sizeof(int));
     result->n_board = calloc(rows * columns, sizeof(int));
@@ -131,4 +132,10 @@ int set_random_pattern(life_board *board) {
     }
     fclose(random_data);
     return 0;
+}
+
+void free_board(life_board *b) {
+    free(b->c_board);
+    free(b->n_board);
+    free(b);
 }

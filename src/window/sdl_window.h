@@ -5,16 +5,22 @@
 #ifndef LIFE_C_SDL_WINDOW_H
 #define LIFE_C_SDL_WINDOW_H
 
-#include <SDL2/SDL.h>
 #include <stdint.h>
+#include <SDL2/SDL.h>
+#include <X11/Xlib.h>
+#include <X11/X.h>
+#include <X11/Xutil.h>
+
 #include "../board/board.h"
 
 typedef struct sdl_window {
     SDL_Renderer *renderer;
     SDL_Window *window;
+    Window x_overlay;
+    Display *x_display;
 } sdl_window;
 
-sdl_window *init_window(int screen_width, int screen_height);
+sdl_window *init_window(int screen_width, int screen_height, bool use_x11);
 
 void draw_board(life_board *board, sdl_window *window);
 
