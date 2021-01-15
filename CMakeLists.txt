@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 project(life-c C)
 
 set(CMAKE_C_STANDARD 11)
-FILE(COPY spotlight-big-alpha3.bmp DESTINATION "${CMAKE_BINARY_DIR}")
+FILE(COPY spotlight-big-alpha4.bmp DESTINATION "${CMAKE_BINARY_DIR}")
 add_compile_options(-Wall -Wextra -Wshadow -pedantic)
 
 find_package(X11 REQUIRED)
