@@ -4,9 +4,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "board.h"
+#include "game.h"
 
-life_board *init_board(int rows, int columns, int cell_size) {
+life_board *init_game(int rows, int columns, int cell_size) {
     life_board *result = malloc(sizeof(life_board));
 
     result->rows = rows;
@@ -20,11 +20,11 @@ life_board *init_board(int rows, int columns, int cell_size) {
 }
 
 
-int get(life_board *board, int x, int y) {
+int get_cell(life_board *board, int x, int y) {
     return board->c_board[x * board->columns + y];
 }
 
-void set(life_board *board, int x, int y, int value, bool curr) {
+void set_cell(life_board *board, int x, int y, int value, bool curr) {
     if (curr) {
         board->c_board[x * board->columns + y] = value;
     } else {
@@ -46,7 +46,7 @@ int count_neighbours(life_board *board, int x, int y) {
             if (new_x < 0 || new_y < 0) continue;
             if (new_x > board->rows - 1 || new_y > board->columns - 1) continue;
             if (new_x == x && new_y == y) continue;
-            if (get(board, new_x, new_y) == ALIVE) alive_neighbour_count++;
+            if (get_cell(board, new_x, new_y) == ALIVE) alive_neighbour_count++;
 
         }
     }
@@ -54,9 +54,9 @@ int count_neighbours(life_board *board, int x, int y) {
 }
 
 bool underpopulation_rule(life_board *board, int x, int y) {
-    if (get(board, x, y) == ALIVE) {
+    if (get_cell(board, x, y) == ALIVE) {
         if (count_neighbours(board, x, y) < UNDERPOP_THRESHOLD) {
-            set(board, x, y, ALIVE / 2, false);
+            set_cell(board, x, y, ALIVE / 2, false);
             return true;
         }
     }
@@ -65,9 +65,9 @@ bool underpopulation_rule(life_board *board, int x, int y) {
 
 bool overpopulation_rule(life_board *board, int x, int y) {
 
-    if (get(board, x, y) == ALIVE) {
+    if (get_cell(board, x, y) == ALIVE) {
         if (count_neighbours(board, x, y) > OVERPOP_THRESHOLD) {
-            set(board, x, y, ALIVE / 2, false);
+            set_cell(board, x, y, ALIVE / 2, false);
             return true;
         }
     }
@@ -75,9 +75,9 @@ bool overpopulation_rule(life_board *board, int x, int y) {
 }
 
 bool reproduction_rule(life_board *board, int x, int y) {
-    if (get(board, x, y) != ALIVE) {
+    if (get_cell(board, x, y) != ALIVE) {
         if (count_neighbours(board, x, y) == REPRODUCTION_VALUE) {
-            set(board, x, y, ALIVE, false);
+            set_cell(board, x, y, ALIVE, false);
             return true;
         }
     }
@@ -85,10 +85,10 @@ bool reproduction_rule(life_board *board, int x, int y) {
 }
 
 bool survival_rule(life_board *board, int x, int y) {
-    if (get(board, x, y) == ALIVE) {
+    if (get_cell(board, x, y) == ALIVE) {
         int live_neighbours = count_neighbours(board, x, y);
         if (live_neighbours >= UNDERPOP_THRESHOLD && live_neighbours <= REPRODUCTION_VALUE) {
-            set(board, x, y, ALIVE, false);
+            set_cell(board, x, y, ALIVE, false);
             return true;
         }
     }
@@ -109,7 +109,7 @@ void advance_generation(life_board *board) {
             if (overpopulation_rule(board, i, j)) continue;
             if (reproduction_rule(board, i, j)) continue;
             if (survival_rule(board, i, j)) continue;
-            set(board, i, j, get(board, i, j) / 2, false);
+            set_cell(board, i, j, get_cell(board, i, j) / 2, false);
         }
     }
     int *tmp = board->c_board;
@@ -127,14 +127,14 @@ int set_random_pattern(life_board *board) {
     for (int i = 0; i < board->rows; i++) {
         for (int j = 0; j < board->columns; j++) {
             fread(&r, sizeof(uint64_t), 1, random_data);
-            set(board, i, j, (uint64_t) ((r % 2L) * ALIVE), true);
+            set_cell(board, i, j, (uint64_t) ((r % 2L) * ALIVE), true);
         }
     }
     fclose(random_data);
     return 0;
 }
 
-void free_board(life_board *b) {
+void destroy_game(life_board *b) {
     free(b->c_board);
     free(b->n_board);
     free(b);

@@ -18,6 +18,6 @@ link_directories(${X11_LIBRARIES})
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 
-add_executable(life-c src/main.c src/window/sdl_window.h src/window/sdl_window.c src/board/board.c src/board/board.h)
+add_executable(life-c src/main.c src/renderer.h src/renderer.c src/game.c src/game.h)
 
 target_link_libraries(life-c ${SDL2_LIBRARIES} ${X11_LIBRARIES})

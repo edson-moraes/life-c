@@ -1,5 +1,5 @@
-#include "window/sdl_window.h"
-#include "board/board.h"
+#include "renderer.h"
+#include "game.h"
 
 #include <time.h>
 
@@ -8,22 +8,22 @@
 int main() {
 
     time_t begin, end;
-    int desktop_width, desktop_height;
 
-    sdl_window window = init_window(&desktop_width, &desktop_height);
-    life_board *board = init_board(desktop_height / CELL_SIZE, desktop_width / CELL_SIZE, CELL_SIZE);
+    renderer_context rc = init_renderer_context();
+    life_board *board = init_game(rc.desktop_height / CELL_SIZE,
+                                  rc.desktop_width / CELL_SIZE, CELL_SIZE);
     set_random_pattern(board);
 
     time(&begin);
     end = begin;
     while (end - begin < 15) {
-        draw_board(board, window);
+        draw_board(board, rc);
         advance_generation(board);
         SDL_Delay(100);
         time(&end);
     }
 
-    destroy_window(window);
-    free_board(board);
+    destroy_renderer_context(rc);
+    destroy_game(board);
     return 0;
 }

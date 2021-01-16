@@ -2,7 +2,7 @@
 // Created by edson-moraes on 1/11/21.
 //
 
-#include "sdl_window.h"
+#include "renderer.h"
 
 void
 get_x_desktop_window(Window *return_desktop_window, Display **return_x_display, int *desktop_width,
@@ -63,14 +63,15 @@ get_x_desktop_window(Window *return_desktop_window, Display **return_x_display, 
     (*return_x_display) = x_display;
 }
 
-sdl_window init_window(int *screen_width, int *screen_height) {
+renderer_context init_renderer_context() {
+    renderer_context result;
     SDL_Renderer *renderer;
     SDL_Window *window;
     Window x_desktop_window = 0;
     Display *x_display = NULL;
 
     SDL_Init(SDL_INIT_VIDEO);
-    get_x_desktop_window(&x_desktop_window, &x_display, screen_width, screen_height);
+    get_x_desktop_window(&x_desktop_window, &x_display, &result.desktop_width, &result.desktop_height);
 
     window = SDL_CreateWindowFrom((void *) x_desktop_window);
     renderer = SDL_CreateRenderer(window, -1, 0);
@@ -83,7 +84,7 @@ sdl_window init_window(int *screen_width, int *screen_height) {
     SDL_Texture *cell_texture = SDL_CreateTextureFromSurface(renderer, image);
     SDL_FreeSurface(image);
 
-    sdl_window result;
+
     result.window = window;
     result.renderer = renderer;
     result.x_overlay = x_desktop_window;
@@ -93,7 +94,7 @@ sdl_window init_window(int *screen_width, int *screen_height) {
     return result;
 }
 
-void draw_board(life_board *board, sdl_window window) {
+void draw_board(life_board *board, renderer_context window) {
     SDL_SetRenderDrawColor(window.renderer, 0, 0, 0, 0);
     SDL_RenderClear(window.renderer);
 
@@ -101,7 +102,7 @@ void draw_board(life_board *board, sdl_window window) {
     for (int i = 0; i < board->rows; i++) {
         for (int j = 0; j < board->columns; j++) {
             SDL_Rect fillRect = {j * cs, i * cs, cs, cs};
-            SDL_SetTextureAlphaMod(window.cell_texture, get(board, i, j) / 3);
+            SDL_SetTextureAlphaMod(window.cell_texture, get_cell(board, i, j) / 10);
             SDL_RenderCopy(window.renderer, window.cell_texture, NULL, &fillRect);
         }
     }
@@ -109,7 +110,7 @@ void draw_board(life_board *board, sdl_window window) {
     XLowerWindow(window.x_display, window.x_overlay);
 }
 
-void destroy_window(sdl_window window) {
+void destroy_renderer_context(renderer_context window) {
     SDL_DestroyWindow(window.window);
     SDL_DestroyRenderer(window.renderer);
     SDL_DestroyTexture(window.cell_texture);
